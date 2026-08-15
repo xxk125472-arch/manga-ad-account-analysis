@@ -1,0 +1,31 @@
+{
+  "name": "Manga Ad Operations Editorial",
+  "dataColors": ["#1B2A4A", "#E86A4A", "#2A9D8F", "#E9C46A", "#557A95", "#7D6B91", "#A6A6A6", "#C8553D"],
+  "background": "#F4F0E8",
+  "foreground": "#1B2A4A",
+  "tableAccent": "#E86A4A",
+  "good": "#2A9D8F",
+  "neutral": "#E9C46A",
+  "bad": "#C8553D",
+  "textClasses": {
+    "callout": {"fontFace": "Microsoft YaHei", "fontSize": 28, "color": "#1B2A4A"},
+    "title": {"fontFace": "Microsoft YaHei", "fontSize": 14, "color": "#1B2A4A"},
+    "header": {"fontFace": "Microsoft YaHei", "fontSize": 12, "color": "#1B2A4A"},
+    "label": {"fontFace": "Microsoft YaHei", "fontSize": 10, "color": "#53606F"}
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{"show": true, "color": {"solid": {"color": "#FFFFFF"}}, "transparency": 0}],
+        "border": [{"show": true, "color": {"solid": {"color": "#DDD8CE"}}, "radius": 8}],
+        "visualHeader": [{"show": false}],
+        "title": [{"show": true, "fontFamily": "Microsoft YaHei", "fontSize": 12, "fontColor": {"solid": {"color": "#1B2A4A"}}}]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [{"color": {"solid": {"color": "#F4F0E8"}}, "transparency": 0}]
+      }
+    }
+  }
+}

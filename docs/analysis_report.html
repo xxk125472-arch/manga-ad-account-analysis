@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>漫剧投放账号效能诊断报告</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #dcd8d0; color: #1b2a4a; font-family: "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; }
+    body { font-size: 10.3pt; line-height: 1.55; }
+    .page { width: 210mm; height: 297mm; margin: 0 auto; padding: 15mm 16mm 13mm; background: #f8f5ee; position: relative; overflow: hidden; page-break-after: always; }
+    .page:last-child { page-break-after: auto; }
+    .eyebrow { color: #e86a4a; font-size: 8.5pt; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 5mm 0 3mm; max-width: 152mm; font-size: 31pt; line-height: 1.15; letter-spacing: -.02em; }
+    h2 { margin: 0 0 5mm; font-size: 20pt; line-height: 1.25; }
+    h3 { margin: 0 0 2mm; font-size: 11.5pt; }
+    p { margin: 0 0 3.2mm; }
+    .muted { color: #667080; }
+    .small { font-size: 8.7pt; }
+    .lead { font-size: 13pt; line-height: 1.65; max-width: 154mm; }
+    .rule { height: 1px; background: #cfc9be; margin: 5mm 0; }
+    .footer { position: absolute; left: 16mm; right: 16mm; bottom: 7mm; display: flex; justify-content: space-between; color: #7b8190; font-size: 7.7pt; }
+    .cover { background: #1b2a4a; color: #f8f5ee; }
+    .cover .eyebrow { color: #f2a07e; }
+    .cover .muted { color: #cfd6e2; }
+    .cover-mark { position: absolute; width: 82mm; height: 82mm; right: -27mm; top: 27mm; border: 13mm solid #e86a4a; border-radius: 50%; opacity: .95; z-index: 0; }
+    .cover > h1, .cover > p, .cover > .eyebrow, .cover > .rule { position: relative; z-index: 1; }
+    .cover .cover-grid, .cover .footer { z-index: 1; }
+    .cover-grid { position: relative; margin-top: 16mm; display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
+    .cover-stat { border-top: 1px solid rgba(255,255,255,.35); padding-top: 3mm; }
+    .cover-stat b { display: block; font-size: 18pt; color: white; }
+    .cover-stat span { color: #cfd6e2; font-size: 8.5pt; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin-bottom: 5mm; }
+    .kpi { background: white; border: 1px solid #ded8ce; border-radius: 3mm; padding: 4mm; min-height: 25mm; }
+    .kpi b { display: block; font-size: 17pt; line-height: 1.1; }
+    .kpi span { color: #667080; font-size: 8pt; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+    .grid32 { display: grid; grid-template-columns: 1.45fr .75fr; gap: 5mm; }
+    .card { background: white; border: 1px solid #ded8ce; border-radius: 3mm; padding: 4mm; }
+    .accent { border-left: 3px solid #e86a4a; }
+    .good { border-left: 3px solid #2a9d8f; }
+    .warn { border-left: 3px solid #e9c46a; }
+    ul { margin: 1mm 0 0; padding-left: 5mm; }
+    li { margin-bottom: 2.1mm; }
+    .figure { width: 100%; display: block; background: white; border: 1px solid #ded8ce; border-radius: 3mm; padding: 2mm; }
+    .figure.short { max-height: 107mm; object-fit: contain; }
+    .caption { color: #667080; font-size: 8pt; margin-top: 1.5mm; }
+    table { width: 100%; border-collapse: collapse; font-size: 8.8pt; background: white; }
+    th { text-align: left; background: #e9edf3; color: #1b2a4a; font-weight: 800; }
+    th, td { padding: 2.1mm 2.3mm; border-bottom: 1px solid #ddd8cf; vertical-align: top; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .tag { display: inline-block; padding: .7mm 2mm; border-radius: 99px; background: #e9edf3; font-size: 7.5pt; font-weight: 700; }
+    .section-label { display: flex; align-items: center; gap: 2.5mm; margin-bottom: 4mm; }
+    .num { font-variant-numeric: tabular-nums; }
+    .rank { color: #e86a4a; font-size: 21pt; font-weight: 900; line-height: 1; }
+    .quote { font-size: 14pt; line-height: 1.6; padding: 6mm; background: #1b2a4a; color: white; border-radius: 3mm; }
+    .method { counter-reset: method; }
+    .method .card { position: relative; padding-left: 13mm; }
+    .method .card::before { counter-increment: method; content: counter(method); position: absolute; left: 4mm; top: 4mm; width: 6mm; height: 6mm; border-radius: 50%; background: #e86a4a; color: white; display: grid; place-items: center; font-weight: 800; font-size: 8pt; }
+    code { font-family: "Noto Sans CJK SC", "Microsoft YaHei", Consolas, sans-serif; font-size: 8.3pt; background: #eef0f3; padding: .3mm 1mm; border-radius: 1mm; }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="cover-mark"></div>
+    <div class="eyebrow">Portfolio Analysis · 2026-08-07</div>
+    <h1>漫剧投放账号<br/>效能诊断与预算分层</h1>
+    <p class="lead muted">基于深度脱敏的单月账号数据，建立可复现的质量审计、加权指标、预算集中度与五类行动池。</p>
+    <div class="rule" style="background:rgba(255,255,255,.3); margin-top:14mm"></div>
+    <p class="muted">个人分析项目 · 蔡健明</p>
+    <p class="small muted">非公司正式上线成果｜匿名替换与同比例缩放｜账号 × 月粒度｜不作因果解释</p>
+    <div class="cover-grid">
+      <div class="cover-stat"><b>551</b><span>匿名账号</span></div>
+      <div class="cover-stat"><b>8</b><span>匿名品牌</span></div>
+      <div class="cover-stat"><b>283</b><span>有效样本账号</span></div>
+      <div class="cover-stat"><b>5</b><span>行动分层</span></div>
+    </div>
+    <div class="footer"><span>漫剧投放账号效能诊断</span><span>01</span></div>
+  </section>
+
+  <section class="page">
+    <div class="eyebrow">Executive answer</div>
+    <h2>先管头部，再按回收状态分动作</h2>
+    <div class="kpis">
+      <div class="kpi"><b>20.71万</b><span>平台投放总消耗</span></div>
+      <div class="kpi"><b>1.03x</b><span>加权 24H 混合 ROI</span></div>
+      <div class="kpi"><b>64.74%</b><span>Top 10% 账号消耗贡献</span></div>
+      <div class="kpi"><b>99.43%</b><span>有效样本消耗覆盖率</span></div>
+    </div>
+    <div class="grid32">
+      <div>
+        <div class="card accent">
+          <h3>回答</h3>
+          <p>551 个账号中，消耗 ≥ 50 的 283 个账号几乎覆盖全部预算；按账号数向下取整的 Top 10%（55 个）贡献 64.74% 消耗。运营资源应优先进入头部账号，而不是平均分配。</p>
+        </div>
+        <div style="height:4mm"></div>
+        <div class="card good">
+          <h3>行动</h3>
+          <ul>
+            <li>62 个核心扩量候选：小幅提高预算上限，设置 2–3 天回收观察窗。</li>
+            <li>9 个高消耗重点优化：先查素材、计划配置与承接链路，必要时降预算。</li>
+            <li>75 个低效清理候选：复核后降级或暂停，避免机械清理。</li>
+            <li>268 个低量账号：补样本或留作测试，不做稳定性好坏判断。</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="card warn">
+          <h3>解释边界</h3>
+          <p>ROI=1 只表示 24H 混合变现覆盖投放消耗，不等于公司利润。</p>
+          <p>数据只有 2026-07 单月，不能生成趋势、归因、LTV 或策略增益结论。</p>
+        </div>
+        <div style="height:4mm"></div>
+        <div class="quote">“把账号从报表行，转换成有前提、有动作、有验证窗口的运营队列。”</div>
+      </div>
+    </div>
+    <div class="rule"></div>
+    <h3>建议验证顺序</h3>
+    <table>
+      <tr><th>优先级</th><th>对象</th><th>先做什么</th><th>验证信号</th></tr>
+      <tr><td><span class="tag">P0</span></td><td>9 个高消耗低回收账号</td><td>配置与链路排查、限额</td><td>观察窗内边际 ROI 与消耗节奏</td></tr>
+      <tr><td><span class="tag">P1</span></td><td>62 个高消耗达标账号</td><td>分批小幅扩量</td><td>增量消耗是否保持回收</td></tr>
+      <tr><td><span class="tag">P2</span></td><td>137 个低消耗达标账号</td><td>小步补量</td><td>跨过样本门槛后的稳定性</td></tr>
+    </table>
+    <div class="footer"><span>来源：pipeline_receipt.json / account_segments.csv</span><span>02</span></div>
+  </section>
+
+  <section class="page">
+    <div class="eyebrow">Brand portfolio</div>
+    <h2>规模主要集中在 C / D / G，效率差异需分品牌解释</h2>
+    <img class="figure short" src="../images/brand_weighted_roi.png" alt="品牌消耗与加权 ROI" />
+    <p class="caption">图 1｜品牌消耗与加权 24H 混合 ROI。比率均由品牌基础量汇总后重算。</p>
+    <div class="grid2" style="margin-top:4mm">
+      <div class="card accent">
+        <h3>规模与回收</h3>
+        <ul>
+          <li>品牌 C 占 48.19% 消耗，ROI 1.04，是最大预算主体。</li>
+          <li>品牌 D / G 合计占 37.76% 消耗，ROI 分别为 1.04 / 1.03。</li>
+          <li>品牌 B / E 的 ROI 为 0.94 / 0.91，应进入排查清单。</li>
+          <li>品牌 A 仅占 0.007% 消耗，不能用其 ROI 0.79 作稳定判断。</li>
+        </ul>
+      </div>
+      <div class="card good">
+        <h3>如何使用</h3>
+        <ul>
+          <li>对 C / D / G：先在头部账号内做扩量与优化分流。</li>
+          <li>对 B / E：拆到账号与素材/计划层验证，不以品牌均值直接停投。</li>
+          <li>对 A：优先确认样本与测试意图，避免低量误判。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer"><span>来源：brand_summary.csv</span><span>03</span></div>
+  </section>
+
+  <section class="page">
+    <div class="eyebrow">Budget concentration</div>
+    <h2>55 个账号贡献近三分之二消耗</h2>
+    <img class="figure short" src="../images/account_pareto.png" alt="账号消耗 Pareto" />
+    <p class="caption">图 2｜账号按消耗降序后的累计贡献。Top 10% 按 floor(551 × 10%) = 55 计算。</p>
+    <div class="grid2" style="margin-top:5mm">
+      <div class="card accent">
+        <div class="rank">64.74%</div>
+        <h3>Top 55 账号消耗占比</h3>
+        <p>集中度本身不是问题，但它放大了少数账号配置、素材衰退或承接异常对整体结果的影响。</p>
+      </div>
+      <div class="card good">
+        <div class="rank" style="color:#2a9d8f">99.43%</div>
+        <h3>有效样本消耗覆盖率</h3>
+        <p>把 268 个低量账号移出稳定性判断，不会丢失主要预算视角，能显著减少噪声。</p>
+      </div>
+    </div>
+    <div class="rule"></div>
+    <h3>运营节奏建议</h3>
+    <table>
+      <tr><th>频率</th><th>对象</th><th>监控项</th><th>触发动作</th></tr>
+      <tr><td>每日</td><td>高消耗账号</td><td>消耗节奏、24H 回收、异常断崖</td><td>配置核查、限额、补素材</td></tr>
+      <tr><td>每 2–3 日</td><td>扩量候选</td><td>增量消耗与边际 ROI</td><td>继续、回撤或停止扩量</td></tr>
+      <tr><td>每周</td><td>低量池</td><td>跨门槛数量与样本完整性</td><td>补量、保留测试或归档</td></tr>
+    </table>
+    <div class="footer"><span>来源：account_pareto.csv / pipeline_receipt.json</span><span>04</span></div>
+  </section>
+
+  <section class="page">
+    <div class="eyebrow">Action pools</div>
+    <h2>分层是优先级框架，不是自动投放决策</h2>
+    <img class="figure short" src="../images/action_segments.png" alt="五类行动池" />
+    <p class="caption">图 3｜消耗门槛 50；有效账号消耗 P75=735.80；ROI 参考线 1.0。</p>
+    <table style="margin-top:4mm">
+      <tr><th>行动池</th><th>账号数</th><th>动作</th><th>必须说明的边界</th></tr>
+      <tr><td>核心扩量候选</td><td class="num">62</td><td>小幅提额，分批观察</td><td>达标不等于增量仍达标</td></tr>
+      <tr><td>高消耗重点优化</td><td class="num">9</td><td>优先排查，必要时降额</td><td>先排除数据/配置异常</td></tr>
+      <tr><td>小步扩量观察</td><td class="num">137</td><td>补量验证稳定性</td><td>低消耗 ROI 波动可能较大</td></tr>
+      <tr><td>低效清理候选</td><td class="num">75</td><td>复核后降级或暂停</td><td>不应机械批量清理</td></tr>
+      <tr><td>数据不足/低量池</td><td class="num">268</td><td>补样本或保留测试</td><td>不得直接判定好坏</td></tr>
+    </table>
+    <div class="rule"></div>
+    <div class="grid2">
+      <div class="card warn">
+        <h3>相关性不是答案</h3>
+        <p>有效样本中，CTR、CPC、播放率与 ROI 的 Spearman 相关绝对值均低于 0.04；重算播放成本与 ROI 为 -0.128。</p>
+        <p>这说明单一前链路指标不够解释回收，只能用于生成后续排查假设。</p>
+      </div>
+      <div class="card good">
+        <h3>下一批数据要补什么</h3>
+        <p>日级消耗与回收、素材 ID、计划/版位/人群、预算调整记录、异常事件与长周期回收。先定义观察窗，再评估边际效果。</p>
+      </div>
+    </div>
+    <div class="footer"><span>来源：account_segments.csv / correlation_matrix.csv</span><span>05</span></div>
+  </section>
+
+  <section class="page">
+    <div class="eyebrow">Methods & audit</div>
+    <h2>结论可追溯到基础量、规则与验证回执</h2>
+    <div class="grid2 method">
+      <div class="card">
+        <h3>源数据契约</h3>
+        <p>2026-07 单月；账号 × 月；551 行、22 字段、8 品牌。无缺失、重复键、负值或播放/点击超过展示。</p>
+      </div>
+      <div class="card">
+        <h3>加权指标</h3>
+        <p>CTR=<code>Σ点击/Σ展示</code>；ROI=<code>Σ混合变现/Σ消耗</code>；禁止平均账号级比率。</p>
+      </div>
+      <div class="card">
+        <h3>播放成本审计</h3>
+        <p>源字段在 534 个有消耗账号中匹配 <code>播放/消耗</code>；分析统一重算 <code>消耗/播放</code>。</p>
+      </div>
+      <div class="card">
+        <h3>分层规则</h3>
+        <p>消耗门槛 50；有效账号内消耗 P75=735.80；ROI 参考线 1.0；形成五类互斥、完备标签。</p>
+      </div>
+      <div class="card">
+        <h3>多端对账</h3>
+        <p>Python、MySQL、Notebook、Excel、React 与 Power BI 构建包共享字段与公式，回执校验品牌、分层和公开字段。</p>
+      </div>
+      <div class="card">
+        <h3>解释限制</h3>
+        <p>匿名替换与同比例缩放；金额不代表真实经营规模；相关性不代表因果；未验证任何策略收益。</p>
+      </div>
+    </div>
+    <div class="rule"></div>
+    <h3>复现路径</h3>
+    <table>
+      <tr><th>资产</th><th>作用</th><th>检查证据</th></tr>
+      <tr><td><code>scripts/run_pipeline.py</code></td><td>一次生成 CSV / JSON / PNG</td><td><code>outputs/pipeline_receipt.json</code></td></tr>
+      <tr><td><code>tests/</code></td><td>数据契约与业务逻辑测试</td><td>完整单元测试输出</td></tr>
+      <tr><td><code>docs/data_dictionary.xlsx</code></td><td>字段、口径、质量与行动规则</td><td>五表渲染与公式扫描</td></tr>
+      <tr><td><code>web/</code></td><td>静态交互看板</td><td>桌面/筛选/移动端视觉 QA</td></tr>
+    </table>
+    <div class="card accent" style="margin-top:6mm">
+      <h3>最终判断</h3>
+      <p>本项目最有价值的不是“找到一个万能指标”，而是把口径错误、预算集中度、样本噪声和行动优先级放进同一套可复查流程。真正上线前仍需日级数据与受控验证。</p>
+    </div>
+    <div class="footer"><span>个人分析项目 · 蔡健明</span><span>06</span></div>
+  </section>
+</body>
+</html>

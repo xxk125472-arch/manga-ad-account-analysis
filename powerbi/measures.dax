@@ -1,0 +1,139 @@
+// 表名约定：账户投放（由 account_segments.csv 导入）
+// 所有比率都从基础量汇总后计算，禁止对账号级比率直接求平均。
+
+总展示 =
+SUM('账户投放'[impressions])
+
+总点击 =
+SUM('账户投放'[clicks])
+
+总播放 =
+SUM('账户投放'[plays])
+
+总消耗 =
+SUM('账户投放'[platform_spend])
+
+总实际消耗 =
+SUM('账户投放'[actual_spend])
+
+24H混合变现 =
+SUM('账户投放'[mixed_revenue_24h])
+
+加权CTR =
+DIVIDE([总点击], [总展示])
+
+加权CPC =
+DIVIDE([总消耗], [总点击])
+
+加权CPM =
+DIVIDE([总消耗] * 1000, [总展示])
+
+加权播放率 =
+DIVIDE([总播放], [总展示])
+
+重算播放成本 =
+DIVIDE([总消耗], [总播放])
+
+24H混合ROI =
+DIVIDE([24H混合变现], [总消耗])
+
+账号数 =
+DISTINCTCOUNT('账户投放'[account_id])
+
+有效账号数 =
+CALCULATE(
+    [账号数],
+    KEEPFILTERS('账户投放'[platform_spend] >= 50)
+)
+
+消耗门槛 =
+50.0
+
+ROI参考线 =
+1.0
+
+高消耗边界 =
+VAR EligibleAccounts =
+    FILTER(
+        VALUES('账户投放'[account_id]),
+        CALCULATE([总消耗]) >= [消耗门槛]
+    )
+RETURN
+    PERCENTILEX.INC(EligibleAccounts, CALCULATE([总消耗]), 0.75)
+
+有效样本消耗覆盖率 =
+VAR EligibleSpend =
+    CALCULATE(
+        [总消耗],
+        KEEPFILTERS('账户投放'[platform_spend] >= [消耗门槛])
+    )
+RETURN
+    DIVIDE(EligibleSpend, [总消耗])
+
+ROI达标账号数 =
+CALCULATE(
+    [账号数],
+    KEEPFILTERS('账户投放'[platform_spend] >= [消耗门槛]),
+    KEEPFILTERS('账户投放'[mixed_roi_recalc] >= [ROI参考线])
+)
+
+核心扩量候选数 =
+CALCULATE(
+    [账号数],
+    KEEPFILTERS('账户投放'[action_segment] = "核心扩量候选")
+)
+
+高消耗重点优化数 =
+CALCULATE(
+    [账号数],
+    KEEPFILTERS('账户投放'[action_segment] = "高消耗重点优化")
+)
+
+小步扩量观察数 =
+CALCULATE(
+    [账号数],
+    KEEPFILTERS('账户投放'[action_segment] = "小步扩量观察")
+)
+
+低效清理候选数 =
+CALCULATE(
+    [账号数],
+    KEEPFILTERS('账户投放'[action_segment] = "低效清理候选")
+)
+
+低量池账号数 =
+CALCULATE(
+    [账号数],
+    KEEPFILTERS('账户投放'[action_segment] = "数据不足/低量池")
+)
+
+账号消耗排名 =
+RANKX(
+    ALLSELECTED('账户投放'[account_id]),
+    [总消耗],
+    ,
+    DESC,
+    Dense
+)
+
+账号消耗占比 =
+DIVIDE(
+    [总消耗],
+    CALCULATE([总消耗], ALLSELECTED('账户投放'[account_id]))
+)
+
+累计消耗占比 =
+VAR CurrentRank = [账号消耗排名]
+VAR RankedAccounts =
+    ADDCOLUMNS(
+        ALLSELECTED('账户投放'[account_id]),
+        "@Spend", CALCULATE([总消耗]),
+        "@Rank", RANKX(ALLSELECTED('账户投放'[account_id]), CALCULATE([总消耗]), , DESC, Dense)
+    )
+VAR RunningSpend =
+    SUMX(FILTER(RankedAccounts, [@Rank] <= CurrentRank), [@Spend])
+RETURN
+    DIVIDE(RunningSpend, CALCULATE([总消耗], ALLSELECTED('账户投放'[account_id])))
+
+播放成本源字段提示 =
+"源字段 play_cost 与常规成本公式方向相反；本报告统一使用总消耗÷总播放。"

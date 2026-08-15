@@ -1,0 +1,29 @@
+# Sensitive or local-only inputs
+data/raw/
+secrets/
+.env
+.env.*
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Frontend
+web/node_modules/
+web/dist/
+
+# Office temporary files
+~$*.xlsx
+~$*.docx
+*.bak
+powerbi/*.tmp
+
+# Local QA and packaging intermediates
+qa/
+deliverables/
+docs/*.inspect.ndjson
+*.log

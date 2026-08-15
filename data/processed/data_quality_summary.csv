@@ -1,0 +1,17 @@
+﻿check_name,value,status,severity,description
+row_count,551,通过,信息,数据行数
+column_count,22,通过,信息,规范字段数
+account_count,551,通过,信息,唯一账号数
+brand_count,8,通过,信息,品牌数
+missing_cells,0,通过,正常,缺失单元格数
+duplicate_rows,0,通过,正常,完全重复行数
+duplicate_account_month_keys,0,通过,正常,账号—月份复合键重复行数
+zero_impression_accounts,17,注意,提示,展示量为 0 的账号数；对应比率按空值处理
+zero_click_accounts,83,注意,提示,点击量为 0 的账号数；CPC 需结合消耗解读
+zero_spend_accounts,17,注意,提示,平台消耗为 0 的账号数；ROI 按空值处理
+zero_play_accounts,82,注意,提示,播放量为 0 的账号数；播放成本需谨慎解读
+negative_measure_cells,0,通过,正常,核心数量/金额字段中的负值单元格数
+click_gt_impressions,0,通过,正常,点击量大于展示量的账号数
+play_gt_impressions,0,通过,正常,播放量大于展示量的账号数
+play_cost_formula_mismatch_accounts,469,未通过,错误,有播放账号中，源“播放成本”不等于消耗÷播放量的账号数；分析改用重算字段
+play_cost_matches_inverse_definition_accounts,534,注意,提示,有消耗账号中，源“播放成本”实际等于播放量÷消耗的账号数

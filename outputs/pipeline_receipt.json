@@ -1,0 +1,29 @@
+{
+  "pipeline_version": "1.0.0",
+  "run_at_utc": "2026-08-07T04:27:58.251670+00:00",
+  "source_file": "manga_ad_account_2026_07_anonymized.xlsx",
+  "source_sha256": "7814ec497068ce7dc8ce8910acca538377a45e15ae5d5c66cedca3a2a4e99045",
+  "output_counts": {
+    "csv_files": 6,
+    "figure_files": 4,
+    "dashboard_accounts": 551
+  },
+  "parameters": {
+    "spend_floor": 50.0,
+    "roi_line": 1.0,
+    "high_spend_quantile": 0.75,
+    "high_spend_threshold": 735.80492,
+    "eligible_accounts": 283,
+    "eligible_spend_coverage": 0.9943377700143088
+  },
+  "checks": {
+    "row_count_is_551": true,
+    "account_count_is_551": true,
+    "brand_count_is_8": true,
+    "brand_spend_reconciles": true,
+    "segment_count_reconciles": true,
+    "spend_matches_verified_source": true,
+    "dashboard_accounts_are_public_safe": true,
+    "all_reconciliations_passed": true
+  }
+}
